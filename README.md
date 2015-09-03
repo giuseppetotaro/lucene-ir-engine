@@ -3,9 +3,9 @@ _lucene-ir-engine_ is an extremely simple Java application based on [Apache Tika
 It provides the following features: 
 
   * Parsing and extraction of metadata and text content from various 
-    documents.
+    documents;
   * Indexing of plain text and metadata in order to create an inverted index 
-    related to parsed documents.
+    related to parsed documents;
   * Performing a simple search by term within a previously created inverted 
     index.
 
