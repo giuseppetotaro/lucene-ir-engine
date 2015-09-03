@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %logger{36} [%M:%L] - %msg%n" />
+    </Console>
+    <File name="LogFile" fileName="${sys:logfile.name}" immediateFlush="true" append="false">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %logger{36} [%M:%L] - %msg%n" />
+    </File>
+  </Appenders>
+  <Loggers>
+    <Root level="info">
+      <AppenderRef ref="LogFile" />
+    </Root>
+  </Loggers>
+</Configuration>
