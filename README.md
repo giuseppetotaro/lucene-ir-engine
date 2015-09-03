@@ -26,11 +26,9 @@ lucene-ir-engine is a [Maven](https://maven.apache.org/) project organized as fo
     
   * `src`:
     This directory includes source files. It contains also the shell scripts to easily execute the utilities provided by lucene-ir-engine.
-    The scripts are located into `src/main/bin`:
-    * `indexer.sh`:
-    * `searcher.sh`:
+    These scripts are located into `src/main/bin`.
 
-  * README.txt
+  * `README.txt`:
     This README plain-text file.
 
 ## Getting Started
