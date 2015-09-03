@@ -35,9 +35,6 @@ lucene-ir-engine is a [Maven](https://maven.apache.org/) project organized as fo
 
   * README.txt
     This README plain-text file.
-=======
-An extremely simple IR Engine based on Apache Tika and Apache Lucene for indexing and searching heterogeneous documents.
->>>>>>> origin/master
 
 ## Getting Started
 
@@ -45,7 +42,6 @@ To build the project, you can type the following command:
 
 > mvn clean install
 
-<<<<<<< HEAD
 To run the utilities of lucene-ir-engine, you can launch the following scripts (in `/src/main/bin`):
 
 * `indexer.sh` aims at indexing metadata and text extracted from heterogeneous documents:
@@ -68,11 +64,3 @@ Currently, the script `searcher.sh` requires that package, that is located into 
 ## License
 
 [Apache License, version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
-=======
-To run the ctakes-clinical-pipeline, you can launch the following scripts (in `/src/main/bin`):
-
-* ./indexer.sh
-* ./searcher.sh
-
-In `/src/main/bin`, you can find also the same utilities for Windows (i.e., `indexer.bat` and `searcher.bat`).
->>>>>>> origin/master
