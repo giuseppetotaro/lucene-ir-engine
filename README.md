@@ -1,7 +1,4 @@
 # lucene-ir-engine
-<<<<<<< HEAD
-lucene-ir-engine An extremely simple IR Engine based on Apache Tika and Apache Lucene for indexing and searching heterogeneous documents.
-
 _lucene-ir-engine_ is an extremely simple Java application based on [Apache Tika](http://tika.apache.org/) and [Apache Lucene](http://lucene.apache.org/).
 It provides the following features: 
 
