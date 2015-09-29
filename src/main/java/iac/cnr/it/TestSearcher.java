@@ -15,89 +15,151 @@
  */
 package iac.cnr.it;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FilenameFilter;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 
+
+
 public class TestSearcher {
+	private static Logger logger = LogManager.getLogger("TestSearcher");
+	
+	private final static String OPT_INDEX = "index";
+	private final static String OPT_QUERY = "seed";
+	
+	private static String INFO_FILENAME = "info.txt";
+	
+	private static String FIELD_PATH = "fs_pathname";
+	private static String FIELD_FILENAME = "fs_filename";
+	private static String FIELD_IMAGE_ID = "fs_image_uuid";
+	
+	private static HashMap<Integer, String> imagesMap;
+	
     private static void usage() {
-	String usage = "Usage:\tjava -cp CLASSPATH " + TestSearcher.class.getCanonicalName()
-	        + " -index INDEX_DIR [INDEX_DIR [INDEX_DIR [...]]] -seed STRING\n" 
-		+ "NOTE: Using quotes to include spaces in parameters";
-	System.err.println(usage);
-	System.exit(1);
+    	System.out.print("Usage:\n\t");
+    	
+    	StringBuilder sb = new StringBuilder();
+    	
+    	sb.append(TestSearcher.class.getCanonicalName());
+    	sb.append(" -").append(OPT_INDEX).append(" [CASE_PATH]");
+    	sb.append(" -").append(OPT_QUERY).append(" [QUERY]\n");
+    	//String usage = "Usage:\tjava -cp CLASSPATH " + TestSearcher.class.getCanonicalName()
+	    //    + " -index INDEX_DIR [INDEX_DIR [INDEX_DIR [...]]] -seed STRING\n" 
+		//+ "NOTE: Using quotes to include spaces in parameters";
+    	System.out.println(sb.toString());
     }
 
     public static void main(String[] args) throws IOException, ParseException {
-	ArrayList<String> subIndexesList = new ArrayList<String>();
-	String seed = null;
+    	/** Command line parser and options */
+		CommandLineParser parser = new PosixParser();
 
-	if (args.length < 4) {
-	    usage();
-	}
-	for (int i = 0; i < args.length; i++) {
-	    if ("-index".equals(args[i])) {
-		while ((++i < args.length) && !("-seed".equals(args[i]))) {
-		    File indexDir = new File(args[i]);
-		    File directories[] = indexDir.listFiles(new FilenameFilter() {
-		        public boolean accept(File dir, String name) {
-		            return new File(dir, name).isDirectory();
-		        }
-		    });
-		    if (directories.length > 0) {
-			String directoryPaths[] = new String[directories.length];
-			for (int j = 0; j < directories.length; j++) {
-			    directoryPaths[j] = directories[j].getCanonicalPath();
-			}
-			subIndexesList.addAll(Arrays.asList(directoryPaths));
-		    }
-		    else {
-			subIndexesList.add(args[i]);
-		    }
-		}
-		i--;
-	    } else if ("-seed".equals(args[i])) {
-		seed = args[++i];
-	    } else {
-		usage();
-	    }
-	}
-
-	Searcher searcher = null;
-	try {
-	    searcher = new Searcher(subIndexesList.toArray(new String[subIndexesList.size()]));
-	    
-	    TopDocs results = searcher.search(seed, Integer.MAX_VALUE);
-
-	    ScoreDoc[] hits = results.scoreDocs;
-	    int numTotalHits = results.totalHits;
-
-	    System.out.println(numTotalHits + " total matching documents");
-
-	    for (int i = 0; i < numTotalHits; i++) {
-		Document doc = searcher.doc(hits[i].doc);
+		Options options = new Options();
+		options.addOption(OPT_INDEX, true, "Index path");
+		options.addOption(OPT_QUERY, true, "The query");
 		
-		String path = doc.get("fs_pathname");
-		String filename = doc.get("fs_filename");
-		if (path != null) {
-		    System.out.println((i + 1) + ". " + path + File.separator + filename + " - score: " + hits[i].score);
-		} else {
-		    System.out.println((i + 1) + ". " + "No path for this document");
+		CommandLine cmd = null;
+		try {
+			cmd = parser.parse(options, args);
+		} catch (org.apache.commons.cli.ParseException e) {
+			logger.fatal("Error while parsing command line arguments");
+			System.exit(1);
 		}
-	    }
+		
+		/** Check for mandatory options */
+		if (!cmd.hasOption(OPT_INDEX) || !cmd.hasOption(OPT_QUERY)) {
+			usage();
+			System.exit(0);
+		}
+		
+		/** Read options */
+		File casePath = new File(cmd.getOptionValue(OPT_INDEX));
+		String query = cmd.getOptionValue(OPT_QUERY);
 
-	} catch (Exception e) {
-	    System.err.println("An error occurred: " + e.getMessage());
-	    e.printStackTrace();
-	} finally {
-	    searcher.close();
-	}
+		/** Check correctness of the path containing an ISODAC case */
+		if (!casePath.exists() || !casePath.isDirectory()) {
+			logger.fatal("The case directory \"" + casePath.getAbsolutePath() + "\" is not valid");
+			System.exit(1);
+		}
+		
+		/** Check existance of the info.dat file */
+		File infoFile = new File(casePath, INFO_FILENAME);
+		if (!infoFile.exists()) {
+			logger.fatal("Can't find " + INFO_FILENAME +
+						" within the case directory (" + casePath + ")");
+			System.exit(1);
+		}
+		
+		/** Load the mapping image_uuid --> image_filename */
+		imagesMap = new HashMap<Integer, String>();
+		BufferedReader reader = new BufferedReader(new FileReader(infoFile));
+		while (reader.ready()) {
+			String line = reader.readLine();
+		
+			logger.info("Read the line: " + line);
+			String currentID = line.split("\t")[0];
+			String currentImgFile = line.split("\t")[1];
+			imagesMap.put(Integer.parseInt(currentID), currentImgFile);
+			logger.info("ID: " + currentID + " - IMG: " + currentImgFile + " added to the map");
+			
+		}
+		reader.close();
+		
+		/** Load all the directories containing an index */
+		ArrayList<String> indexesDirs = new ArrayList<String>();
+		for (File f : casePath.listFiles()) {
+			logger.info("Analyzing: " + f);
+			if (f.isDirectory())
+				indexesDirs.add(f.getAbsolutePath());
+		}
+		logger.info(indexesDirs.size() + " directories found!");
+		
+		/** Set-up the searcher */
+		Searcher searcher = null;
+		try {
+			String[] array = indexesDirs.toArray(new String[indexesDirs.size()]);
+			searcher = new Searcher(array);
+		    TopDocs results = searcher.search(query, Integer.MAX_VALUE);
+		    
+		    ScoreDoc[] hits = results.scoreDocs;
+		    int numTotalHits = results.totalHits;
+	
+		    System.out.println(numTotalHits + " total matching documents");
+	
+		    for (int i = 0; i < numTotalHits; i++) {
+				Document doc = searcher.doc(hits[i].doc);
+				
+				String path = doc.get(FIELD_PATH);
+				String filename = doc.get(FIELD_FILENAME);
+				String image_uuid = doc.get(FIELD_IMAGE_ID);
+				
+				if (path != null) {
+				    //System.out.println((i + 1) + ". " + path + File.separator + filename + " - score: " + hits[i].score);
+//					System.out.println((i + 1) + ". " + path + File.separator + filename + " - image_file: " + image_uuid);
+					System.out.println((i + 1) + ". " + path + File.separator + filename + " - image_file: " + imagesMap.get(Integer.parseInt(image_uuid)));
+				} else {
+				    System.out.println((i + 1) + ". " + "No path for this document");
+				}
+		    }
+		    
+		} catch (Exception e) {
+			System.err.println("An error occurred: " + e.getMessage());
+		    e.printStackTrace();
+		} finally {
+	    	if (searcher != null) searcher.close();
+		}
     }
 }
