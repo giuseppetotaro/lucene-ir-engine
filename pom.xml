@@ -7,8 +7,9 @@
   <description>An extremely simple IR Engine based on Apache Tika and Apache Lucene for indexing and searching heterogeneous documents.</description>
   
   <properties>
-    <lucene.version>5.3.0</lucene.version>
-    <tika.version>1.10</tika.version>
+    <maven.compiler.release>9</maven.compiler.release>
+    <lucene.version>7.6.0</lucene.version>
+    <tika.version>1.20</tika.version>
     <log4j.version>2.3</log4j.version>
     <commons-cli.version>1.2</commons-cli.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -16,6 +17,14 @@
   
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.0</version>
+        <configuration>
+          <release>9</release>
+        </configuration>
+      </plugin>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.5.5</version>
@@ -56,6 +65,11 @@
       <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-queries</artifactId>
+      <version>${lucene.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-suggest</artifactId>
       <version>${lucene.version}</version>
     </dependency>
     <dependency>

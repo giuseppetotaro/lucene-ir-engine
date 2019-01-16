@@ -11,9 +11,9 @@ It provides the following features:
 
 To perform the tasks above, ir-engine uses two Java libraries:
 
-  * Apache Tika (1.10) provides Java APIs to detect and extract metadata and data
+  * Apache Tika (1.20) provides Java APIs to detect and extract metadata and data
     from heterogenous file formats using existing parser libraries. 
-  * Apache Lucene (5.3.0) is a powerful Java library for indexing and searching 
+  * Apache Lucene (7.6.0) is a powerful Java library for indexing and searching 
     of text.
 
 lucene-ir-engine is a [Maven](https://maven.apache.org/) project organized as follows:
@@ -44,6 +44,9 @@ To run the utilities of lucene-ir-engine, you can launch the following scripts (
 
 * `searcher.sh` aims at performing search queries against previously built Lucene indexes:
 > ./searcher.sh -i /path/to/index_dir -s seed
+
+* `lister.sh` aims at extracting the list of keywords in the Lucene indexes:
+> ./lister.sh -i /path/to/index_dir -o /path/to/output_file
 
 Furthermore, the scripts for Microsoft Windows systems are provided into the same directory.
 

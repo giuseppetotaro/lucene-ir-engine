@@ -95,7 +95,7 @@ public class TestSearcher {
 			System.exit(1);
 		}
 		
-		/** Check existance of the info.dat file */
+		/** Check existence of the info.dat file */
 		File infoFile = new File(casePath, INFO_FILENAME);
 		if (!infoFile.exists()) {
 			logger.fatal("Can't find " + INFO_FILENAME +
@@ -135,7 +135,7 @@ public class TestSearcher {
 		    TopDocs results = searcher.search(query, Integer.MAX_VALUE);
 		    
 		    ScoreDoc[] hits = results.scoreDocs;
-		    int numTotalHits = results.totalHits;
+		    long numTotalHits = results.totalHits;
 	
 		    System.out.println(numTotalHits + " total matching documents");
 	

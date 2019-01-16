@@ -14,6 +14,8 @@ set UPDATE=""
 set FORK=""
 set OCR=""
 
+set IR_PATH="..\..\..\target"
+
 for %%x in (%*) do (
 	if [%%x]==[update] set UPDATE="-update" & echo Trying to update the existing index...
 	if [%%x]==[fork] set FORK="-fork" & echo Using fork parser...
