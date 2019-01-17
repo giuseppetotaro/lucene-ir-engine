@@ -18,7 +18,6 @@ package iac.cnr.it;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.nio.file.Paths;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -72,7 +71,7 @@ public class Indexer {
 		numErrors = 0;
 		numFiles = 0;
 
-		Directory dir = FSDirectory.open(Paths.get(URI.create(indexDir)));
+		Directory dir = FSDirectory.open(Paths.get(indexDir));
 		Analyzer analyzer = new StandardAnalyzer();
 		IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
 

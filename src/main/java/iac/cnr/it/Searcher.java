@@ -16,7 +16,6 @@
 package iac.cnr.it;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Paths;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -43,7 +42,7 @@ public class Searcher {
 	
 	IndexReader[] subReaders = new IndexReader[subIndexes.length];
 	for (int i = 0; i<subIndexes.length; i++) {
-	    subReaders[i] = DirectoryReader.open(FSDirectory.open(Paths.get(URI.create(subIndexes[i]))));
+	    subReaders[i] = DirectoryReader.open(FSDirectory.open(Paths.get(subIndexes[i])));
 	}
 	
 	multiReader = new MultiReader(subReaders, true);
