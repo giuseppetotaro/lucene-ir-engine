@@ -41,8 +41,6 @@ public class TestSearcher {
 	private final static String OPT_INDEX = "index";
 	private final static String OPT_QUERY = "seed";
 	
-	private static String INFO_FILENAME = "info.txt";
-	
 	private static String FIELD_PATH = "fs_pathname";
 	private static String FIELD_FILENAME = "fs_filename";
 	private static String FIELD_IMAGE_ID = "fs_image_uuid";
@@ -95,29 +93,6 @@ public class TestSearcher {
 			System.exit(1);
 		}
 		
-		/** Check existence of the info.dat file */
-		File infoFile = new File(casePath, INFO_FILENAME);
-		if (!infoFile.exists()) {
-			logger.fatal("Can't find " + INFO_FILENAME +
-						" within the case directory (" + casePath + ")");
-			System.exit(1);
-		}
-		
-		/** Load the mapping image_uuid --> image_filename */
-		imagesMap = new HashMap<Integer, String>();
-		BufferedReader reader = new BufferedReader(new FileReader(infoFile));
-		while (reader.ready()) {
-			String line = reader.readLine();
-		
-			logger.info("Read the line: " + line);
-			String currentID = line.split("\t")[0];
-			String currentImgFile = line.split("\t")[1];
-			imagesMap.put(Integer.parseInt(currentID), currentImgFile);
-			logger.info("ID: " + currentID + " - IMG: " + currentImgFile + " added to the map");
-			
-		}
-		reader.close();
-		
 		/** Load all the directories containing an index */
 		ArrayList<String> indexesDirs = new ArrayList<String>();
 		for (File f : casePath.listFiles()) {
@@ -147,9 +122,8 @@ public class TestSearcher {
 				String image_uuid = doc.get(FIELD_IMAGE_ID);
 				
 				if (path != null) {
-				    //System.out.println((i + 1) + ". " + path + File.separator + filename + " - score: " + hits[i].score);
-//					System.out.println((i + 1) + ". " + path + File.separator + filename + " - image_file: " + image_uuid);
-					System.out.println((i + 1) + ". " + path + File.separator + filename + " - image_file: " + imagesMap.get(Integer.parseInt(image_uuid)));
+				    System.out.println((i + 1) + ". " + path + File.separator + filename + " - score: " + hits[i].score);
+                                    //System.out.println((i + 1) + ". " + path + File.separator + filename + " - image_file: " + imagesMap.get(Integer.parseInt(image_uuid)));
 				} else {
 				    System.out.println((i + 1) + ". " + "No path for this document");
 				}
